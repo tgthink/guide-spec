@@ -2,7 +2,7 @@
 
 
 
-- [Javascript规范](javascript-giude.md) <span class="std-rec">[1.3]</span>
+- [Javascript规范](javascript-giude.md) <span class="std-rec">[1.0]</span>
 
 
 
