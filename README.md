@@ -3,25 +3,29 @@
 [1 命名规则](#user-content-1-命名规则)
 
 [1.1 目录命名](#user-content-11-目录命名)
-[1.2 html文件命名](#user-content-12-html文件命名)
-[1.3 JS文件命名](#user-content-12-JS文件命名)
-[1.4 css,less文件命名](#user-content-12-css,less文件命名)
+
+[1.2 其他文件命名](#user-content-12-其他文件命名)
 
 ## 1 命名规则
 ### 1.1 目录命名
 ##### 全部采用小写方式，以下划线分隔。
-例：scripts, styles, images, data_models
+例：css, fonts, images, js, data_models
 
-项目目录说明
-css:放置样式文件
 
-fonts:放置字体文件
+### 1.2 其他文件命名
+##### 参照目录命名规则。
+html文件命名 例：error_report.html
 
-images:放置图片文件
+js文件命名 例：account_model.js
 
-js:放置js文件
+css,less文件命名 例：retina_sprites.less
+
+
+
 
 - [Javascript规范](javascript-giude.md) <span class="std-rec">[1.0]</span>
+- [CSS,Less规范](css-giude.md) <span class="std-rec">[1.0]</span>
+
 
 
 
