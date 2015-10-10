@@ -10,7 +10,16 @@
 
 | 数据类型 | 数据类型中文名 | 前缀  | 说明 |
 | -------- | -------- | --- | --- |
-| Array    | 数组 | a |--|
+| Array | 数组 | a |--|
+| Bool | 布尔值 | b |--|
+| Float | 浮点数 | l |--|
+| Function | 函数,方法 |--|--|
+| Int | 整型 | n |--|
+| Object | 对象 | o |--|
+| Regular Expression | 正则 | r |--|
+| String | 字符串 | s |--|
+| JQuery Object | JQuery对象 | $ |--|
+| Class | 类 |--|等同于function|
 
 
 
