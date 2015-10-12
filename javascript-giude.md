@@ -12,6 +12,10 @@
 
 　　[1.2 命名](#user-content-12-命名)
 
+　　[1.3 注释](#user-content-13-注释)
+
+　　　　[1.3.1 单行注释](#user-content-131-单行注释)
+
 ## 1 代码风格
 
 ### 1.1 结构
@@ -254,7 +258,6 @@ var obj3 = {name: 'obj', age: 20, sex: 1};
 
 #### 1.1.3 换行
 
-
 ##### [强制] 运算符处换行时，运算符必须在新行的行首。
 
 示例：
@@ -426,6 +429,76 @@ var array = [
 ];
 ```
 
+#### 1.1.4 语句
+
+
+##### [强制] 不得省略语句结束的分号。
+
+##### [强制] 在 `if / else / for / do / while` 语句中，即使只有一行，也不得省略块 `{...}`。
+
+示例：
+
+```javascript
+// good
+if (condition) {
+    callFunc();
+}
+
+// bad
+if (condition) callFunc();
+if (condition)
+    callFunc();
+```
+
+##### [强制] 函数定义结束不允许添加分号。
+
+示例：
+
+```javascript
+// good
+function funcName() {
+}
+
+// bad
+function funcName() {
+};
+
+// 如果是函数表达式，分号是不允许省略的。
+var funcName = function () {
+};
+```
+
+##### [强制] `IIFE` 必须在函数表达式外添加 `(`，非 `IIFE` 不得在函数表达式外添加 `(`。
+
+解释：
+
+IIFE = Immediately-Invoked Function Expression.
+
+额外的 ( 能够让代码在阅读的一开始就能判断函数是否立即被调用，进而明白接下来代码的用途。而不是一直拖到底部才恍然大悟。
+
+
+示例：
+
+```javascript
+// good
+var task = (function () {
+   // Code
+   return result;
+})();
+
+var func = function () {
+};
+
+
+// bad
+var task = function () {
+    // Code
+    return result;
+}();
+
+var func = (function () {
+});
+```
 
 ### 1.2 命名
 
@@ -559,3 +632,39 @@ var oLoadingData = ajax.get('url');
 oLoadingData.then(callback);
 ```
 
+### 1.3 注释
+
+#### 1.3.1 单行注释
+
+##### [强制] 
+##### 双斜线后，必须跟一个空格；
+##### 缩进与下一行代码保持一致；
+##### 可位于一个代码行的末尾，与代码间隔一个空格。
+
+示例：
+
+```javascript
+if (condition) {
+    // if you made it here, then all security checks passed
+    allowed();
+}
+var zhangsan = 'zhangsan'; // one space after code
+```
+
+#### 1.3.2 多行注释
+
+##### [建议] 最少三行, '*'后跟一个空格（具体参照示例的写法），建议在以下情况下使用：
+##### 难于理解的代码段
+##### 可能存在错误的代码段
+##### 浏览器特殊的HACK代码
+##### 业务逻辑强相关的代码
+
+示例：
+
+```javascript
+if (condition) {
+    // if you made it here, then all security checks passed
+    allowed();
+}
+var zhangsan = 'zhangsan'; // one space after code
+```
