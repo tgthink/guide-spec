@@ -16,6 +16,40 @@
 
 　　　　[1.3.1 单行注释](#user-content-131-单行注释)
 
+　　　　[1.3.2 多行注释](#user-content-132-多行注释)
+
+　　　　[1.3.3 文档注释](#user-content-133-文档注释)
+
+[2 语言特性](#user-content-2-语言特性)
+
+　　[2.1 变量](#user-content-21-变量)
+
+　　[2.2 条件](#user-content-22-条件)
+
+　　[2.3 循环](#user-content-23-循环)
+
+　　[2.4 类型](#user-content-24-类型)
+
+　　　　[2.4.1 类型检测](#user-content-241-类型检测)
+
+　　　　[2.4.2 类型转换](#user-content-242-类型转换)
+
+　　[2.5 字符串](#user-content-25-字符串)
+
+　　[2.6 对象](#user-content-26-对象)
+
+　　[2.7 数组](#user-content-27-数组)
+
+　　[2.8 函数](#user-content-28-函数)
+
+　　　　[2.8.1 函数长度](#user-content-281-函数长度)
+
+　　　　[2.8.2 参数设计](#user-content-282-参数设计)
+
+　　　　[2.8.3 闭包](#user-content-283-闭包)
+
+
+
 ## 1 代码风格
 
 ### 1.1 结构
@@ -667,4 +701,1155 @@ if (condition) {
     allowed();
 }
 var zhangsan = 'zhangsan'; // one space after code
+```
+
+#### 1.3.3 文档注释
+
+##### 各类标签@param, @method等请参考[usejsdoc](http://usejsdoc.org/)和[JSDoc Guide](http://yuri4ever.github.io/jsdoc/)；
+
+##### [强制] 文件顶部必须包含文件注释，用 `@file` 标识文件说明。
+
+示例：
+
+```javascript
+/**
+ * @file Describe the file
+ */
+```
+
+##### [建议] 文件注释中可以用 `@author` 标识开发者信息。
+
+解释：
+
+开发者信息能够体现开发人员对文件的贡献，并且能够让遇到问题或希望了解相关信息的人找到维护人。通常情况文件在被创建时标识的是创建者。随着项目的进展，越来越多的人加入，参与这个文件的开发，新的作者应该被加入 `@author` 标识。
+
+`@author` 标识具有多人时，原则是按照 `责任` 进行排序。通常的说就是如果有问题，就是找第一个人应该比找第二个人有效。比如文件的创建者由于各种原因，模块移交给了其他人或其他团队，后来因为新增需求，其他人在新增代码时，添加 `@author` 标识应该把自己的名字添加在创建人的前面。
+
+`@author` 中的名字不允许被删除。任何劳动成果都应该被尊重。
+
+业务项目中，一个文件可能被多人频繁修改，并且每个人的维护时间都可能不会很长，不建议为文件增加 `@author` 标识。通过版本控制系统追踪变更，按业务逻辑单元确定模块的维护责任人，通过文档与wiki跟踪和查询，是更好的责任管理方式。
+
+对于业务逻辑无关的技术型基础项目，特别是开源的公共项目，应使用 `@author` 标识。
+
+
+示例：
+
+```javascript
+/**
+ * @file Describe the file
+ * @author author-name(mail-name@domain.com)
+ *         author-name2(mail-name2@domain.com)
+ */
+```
+
+##### [建议] 命名空间使用 `@namespace` 标识。
+
+示例：
+
+```javascript
+/**
+ * @namespace
+ */
+var util = {};
+```
+
+##### [建议] 使用 `@class` 标记类或构造函数。
+
+解释：
+
+对于使用对象 `constructor` 属性来定义的构造函数，可以使用 `@constructor` 来标记。
+
+
+示例：
+
+```javascript
+/**
+ * 描述
+ *
+ * @class
+ */
+function Developer() {
+    // constructor body
+}
+```
+
+##### [强制] 使用包装方式扩展类成员时， 必须通过 `@lends` 进行重新指向。
+
+解释：
+
+没有 `@lends` 标记将无法为该类生成包含扩展类成员的文档。
+
+
+示例：
+
+```javascript
+/**
+ * 类描述
+ *
+ * @class
+ * @extends Developer
+ */
+function Fronteer() {
+    Developer.call(this);
+    // constructor body
+}
+
+util.extend(
+    Fronteer.prototype,
+    /** @lends Fronteer.prototype */{
+        _getLevel: function () {
+            // TODO
+        }
+    }
+);
+```
+
+##### [强制] 类的属性或方法等成员信息使用 `@public` / `@protected` / `@private` 中的任意一个，指明可访问性。
+
+解释：
+
+生成的文档中将有可访问性的标记，避免用户直接使用非 `public` 的属性或方法。
+
+示例：
+
+```javascript
+/**
+ * 类描述
+ *
+ * @class
+ * @extends Developer
+ */
+var Fronteer = function () {
+    Developer.call(this);
+
+    /**
+     * 属性描述
+     *
+     * @type {string}
+     * @private
+     */
+    this._level = 'T12';
+
+    // constructor body
+};
+util.inherits(Fronteer, Developer);
+
+/**
+ * 方法描述
+ *
+ * @private
+ * @return {string} 返回值描述
+ */
+Fronteer.prototype._getLevel = function () {
+};
+```
+
+#### 函数/方法注释
+
+##### [强制] 函数/方法注释必须包含函数说明，有参数和返回值时必须使用注释标识。
+
+##### [强制] 参数和返回值注释必须包含类型信息和说明。
+
+##### [建议] 当函数是内部函数，外部不可访问时，可以使用 `@inner` 标识。
+
+示例：
+
+```javascript
+/**
+ * 函数描述
+ *
+ * @param {string} p1 参数1的说明
+ * @param {string} p2 参数2的说明，比较长
+ *     那就换行了.
+ * @param {number=} p3 参数3的说明（可选）
+ * @return {Object} 返回值描述
+ */
+function foo(p1, p2, p3) {
+    var p3 = p3 || 10;
+    return {
+        p1: p1,
+        p2: p2,
+        p3: p3
+    };
+}
+```
+
+##### [强制] 对 Object 中各项的描述， 必须使用 `@param` 标识。
+
+示例：
+
+```javascript
+/**
+ * 函数描述
+ *
+ * @param {Object} option 参数描述
+ * @param {string} option.url option项描述
+ * @param {string=} option.method option项描述，可选参数
+ */
+function foo(option) {
+    // TODO
+}
+```
+
+##### [建议] 重写父类方法时， 应当添加 `@override` 标识。如果重写的形参个数、类型、顺序和返回值类型均未发生变化，可省略 `@param`、`@return`，仅用 `@override` 标识，否则仍应作完整注释。
+
+解释：
+
+简而言之，当子类重写的方法能直接套用父类的方法注释时可省略对参数与返回值的注释。
+
+#### 事件注释
+
+
+##### [强制] 必须使用 `@event` 标识事件，事件参数的标识与方法描述的参数标识相同。
+
+示例：
+
+```javascript
+/**
+ * 值变更时触发
+ *
+ * @event
+ * @param {Object} e e描述
+ * @param {string} e.before before描述
+ * @param {string} e.after after描述
+ */
+onchange: function (e) {
+}
+```
+
+##### [强制] 在会广播事件的函数前使用 `@fires` 标识广播的事件，在广播事件代码前使用 `@event` 标识事件。
+
+##### [建议] 对于事件对象的注释，使用 `@param` 标识，生成文档时可读性更好。
+
+示例：
+
+```javascript
+/**
+ * 点击处理
+ *
+ * @fires Select#change
+ * @private
+ */
+Select.prototype.clickHandler = function () {
+    /**
+     * 值变更时触发
+     *
+     * @event Select#change
+     * @param {Object} e e描述
+     * @param {string} e.before before描述
+     * @param {string} e.after after描述
+     */
+    this.fire(
+        'change',
+        {
+            before: 'foo',
+            after: 'bar'
+        }
+    );
+};
+```
+
+#### 常量注释
+
+
+##### [强制] 常量必须使用 `@const` 标记，并包含说明和类型信息。
+
+示例：
+
+```javascript
+/**
+ * 常量说明
+ *
+ * @const
+ * @type {string}
+ */
+var REQUEST_URL = 'myurl.do';
+```
+
+#### 复杂类型注释
+
+
+##### [建议] 对于类型未定义的复杂结构的注释，可以使用 `@typedef` 标识来定义。
+
+示例：
+
+```javascript
+// `namespaceA~` 可以换成其它 namepaths 前缀，目的是为了生成文档中能显示 `@typedef` 定义的类型和链接。
+/**
+ * 服务器
+ *
+ * @typedef {Object} namespaceA~Server
+ * @property {string} host 主机
+ * @property {number} port 端口
+ */
+
+/**
+ * 服务器列表
+ *
+ * @type {Array.<namespaceA~Server>}
+ */
+var servers = [
+    {
+        host: '1.2.3.4',
+        port: 8080
+    },
+    {
+        host: '1.2.3.5',
+        port: 8081
+    }
+];
+```
+
+#### 细节注释
+
+对于内部实现、不容易理解的逻辑说明、摘要信息等，我们可能需要编写细节注释。
+
+#### [建议] 细节注释遵循单行注释的格式。说明必须换行时，每行是一个单行注释的起始。
+
+示例：
+
+```javascript
+function foo(p1, p2) {
+    // 这里对具体内部逻辑进行说明
+    // 说明太长需要换行
+    for (...) {
+        ....
+    }
+}
+```
+
+##### [强制] 有时我们会使用一些特殊标记进行说明。特殊标记必须使用单行注释的形式。下面列举了一些常用标记：
+
+解释：
+
+1. TODO: 有功能待实现。此时需要对将要实现的功能进行简单说明。
+2. FIXME: 该处代码运行没问题，但可能由于时间赶或者其他原因，需要修正。此时需要对如何修正进行简单说明。
+3. HACK: 为修正某些问题而写的不太好或者使用了某些诡异手段的代码。此时需要对思路或诡异手段进行描述。
+4. XXX: 该处存在陷阱。此时需要对陷阱进行描述。
+
+## 2 语言特性
+
+### 2.1 变量
+
+##### [强制] 变量在使用前必须通过 `var` 定义。
+
+解释：
+
+不通过 var 定义变量将导致变量污染全局环境。
+
+示例：
+
+```javascript
+// good
+var name = 'MyName';
+
+// bad
+name = 'MyName';
+```
+
+##### 一个函数作用域中所有的变量声明尽量提到函数首部，用一个`var`声明，不允许出现两个连续的`var`声明。
+##### 其它形式的代码块,每个 `var` 只能声明一个变量。
+
+解释：
+
+一个 var 声明多个变量，容易导致较长的行长度，并且在修改时容易造成逗号和分号的混淆。
+
+示例：
+
+```javascript
+// good
+function doSomethingWithItems(items) {
+    // use one var
+    var value = 10,
+        result = value + 10,
+        i,
+        len;
+
+    for (i = 0, len = items.length; i < len; i++) {
+        result += 10;
+    }
+}
+// good
+var hangModules = [];
+var missModules = [];
+var visited = {};
+
+// bad
+var hangModules = [],
+    missModules = [],
+    visited = {};
+```
+
+##### [强制] 变量必须 `即用即声明`，不得在函数或其它形式的代码块起始位置统一声明所有变量。
+
+解释： 
+
+变量声明与使用的距离越远，出现的跨度越大，代码的阅读与维护成本越高。虽然JavaScript的变量是函数作用域，还是应该根据编程中的意图，缩小变量出现的距离空间。
+
+
+示例：
+
+```javascript 
+// good
+function kv2List(source) {
+    var list = [];
+
+    for (var key in source) {
+        if (source.hasOwnProperty(key)) {
+            var item = {
+                k: key,
+                v: source[key]
+            };
+            list.push(item);
+        }
+    }
+
+    return list;
+}
+
+// bad
+function kv2List(source) {
+    var list = [];
+    var key;
+    var item;
+
+    for (key in source) {
+        if (source.hasOwnProperty(key)) {
+            item = {
+                k: key,
+                v: source[key]
+            };
+            list.push(item);
+        }
+    }
+
+    return list;
+}
+```
+
+### 2.2 条件
+
+
+##### [强制] 在 Equality Expression 中使用类型严格的 `===`。仅当判断 null 或 undefined 时，允许使用 `== null`。
+
+解释：
+
+使用 === 可以避免等于判断中隐式的类型转换。
+
+
+示例：
+
+```javascript
+// good
+if (age === 30) {
+    // ......
+}
+
+// bad
+if (age == 30) {
+    // ......
+}
+```
+
+##### [建议] 尽可能使用简洁的表达式。
+
+
+示例：
+
+```javascript
+// 字符串为空
+
+// good
+if (!name) {
+    // ......
+}
+
+// bad
+if (name === '') {
+    // ......
+}
+```
+
+```javascript
+// 字符串非空
+
+// good
+if (name) {
+    // ......
+}
+
+// bad
+if (name !== '') {
+    // ......
+}
+```
+
+```javascript
+// 数组非空
+
+// good
+if (collection.length) {
+    // ......
+}
+
+// bad
+if (collection.length > 0) {
+    // ......
+}
+```
+
+```javascript
+// 布尔不成立
+
+// good
+if (!notTrue) {
+    // ......
+}
+
+// bad
+if (notTrue === false) {
+    // ......
+}
+```
+
+```javascript
+// null 或 undefined
+
+// good
+if (noValue == null) {
+  // ......
+}
+
+// bad
+if (noValue === null || typeof noValue === 'undefined') {
+  // ......
+}
+```
+
+##### [建议] 按执行频率排列分支的顺序。
+
+解释：
+
+按执行频率排列分支的顺序好处是：
+
+1. 阅读的人容易找到最常见的情况，增加可读性。
+2. 提高执行效率。
+
+
+##### [建议] 对于相同变量或表达式的多值条件，用 `switch` 代替 `if`。
+
+示例：
+
+```javascript
+// good
+switch (typeof variable) {
+    case 'object':
+        // ......
+        break;
+    case 'number':
+    case 'boolean':
+    case 'string':
+        // ......
+        break;
+}
+
+// bad
+var type = typeof variable;
+if (type === 'object') {
+    // ......
+} else if (type === 'number' || type === 'boolean' || type === 'string') {
+    // ......
+}
+```
+
+##### [建议] 如果函数或全局中的 `else` 块后没有任何语句，可以删除 `else`。
+
+示例：
+
+```javascript
+// good
+function getName() {
+    if (name) {
+        return name;
+    }
+
+    return 'unnamed';
+}
+
+// bad
+function getName() {
+    if (name) {
+        return name;
+    }
+    else {
+        return 'unnamed';
+    }
+}
+```
+
+### 2.3 循环
+
+
+##### [建议] 不要在循环体中包含函数表达式，事先将函数提取到循环体外。
+
+解释：
+
+循环体中的函数表达式，运行过程中会生成循环次数个函数对象。
+
+
+示例：
+
+```javascript
+// good
+function clicker() {
+    // ......
+}
+
+for (var i = 0, len = elements.length; i < len; i++) {
+    var element = elements[i];
+    addListener(element, 'click', clicker);
+}
+
+
+// bad
+for (var i = 0, len = elements.length; i < len; i++) {
+    var element = elements[i];
+    addListener(element, 'click', function () {});
+}
+```
+
+##### [建议] 对循环内多次使用的不变值，在循环外用变量缓存。
+
+示例：
+
+```javascript
+// good
+var width = wrap.offsetWidth + 'px';
+for (var i = 0, len = elements.length; i < len; i++) {
+    var element = elements[i];
+    element.style.width = width;
+    // ......
+}
+
+
+// bad
+for (var i = 0, len = elements.length; i < len; i++) {
+    var element = elements[i];
+    element.style.width = wrap.offsetWidth + 'px';
+    // ......
+}
+```
+
+
+##### [建议] 对有序集合进行遍历时，缓存 `length`。
+
+解释：
+
+虽然现代浏览器都对数组长度进行了缓存，但对于一些宿主对象和老旧浏览器的数组对象，在每次 length 访问时会动态计算元素个数，此时缓存 length 能有效提高程序性能。
+
+
+示例：
+
+```javascript
+for (var i = 0, len = elements.length; i < len; i++) {
+    var element = elements[i];
+    // ......
+}
+```
+
+##### [建议] 对有序集合进行顺序无关的遍历时，使用逆序遍历。
+
+解释：
+
+逆序遍历可以节省变量，代码比较优化。
+
+示例：
+
+```javascript
+var len = elements.length;
+while (len--) {
+    var element = elements[len];
+    // ......
+}
+```
+
+### 2.4 类型
+
+
+#### 2.4.1 类型检测
+
+
+##### [建议] 类型检测优先使用 `typeof`。对象类型检测使用 `instanceof`。`null` 或 `undefined` 的检测使用 `== null`。
+
+示例：
+
+```javascript
+// string
+typeof variable === 'string'
+
+// number
+typeof variable === 'number'
+
+// boolean
+typeof variable === 'boolean'
+
+// Function
+typeof variable === 'function'
+
+// Object
+typeof variable === 'object'
+
+// RegExp
+variable instanceof RegExp
+
+// Array
+variable instanceof Array
+
+// null
+variable === null
+
+// null or undefined
+variable == null
+
+// undefined
+typeof variable === 'undefined'
+```
+
+#### 2.4.2 类型转换
+
+
+##### [建议] 转换成 `string` 时，使用 `+ ''`。
+
+示例：
+
+```javascript
+// good
+num + '';
+
+// bad
+new String(num);
+num.toString();
+String(num);
+```
+
+##### [建议] 转换成 `number` 时，通常使用 `+`。
+
+示例：
+
+```javascript
+// good
++str;
+
+// bad
+Number(str);
+```
+
+##### [建议] `string` 转换成 `number`，要转换的字符串结尾包含非数字并期望忽略时，使用 `parseInt`。
+
+示例：
+
+```javascript
+var width = '200px';
+parseInt(width, 10);
+```
+
+##### [强制] 使用 `parseInt` 时，必须指定进制。
+
+示例：
+
+```javascript
+// good
+parseInt(str, 10);
+
+// bad
+parseInt(str);
+```
+
+##### [建议] 转换成 `boolean` 时，使用 `!!`。
+
+示例：
+
+```javascript
+var num = 3.14;
+!!num;
+```
+
+##### [建议] `number` 去除小数点，使用 `Math.floor / Math.round / Math.ceil`，不使用 `parseInt`。
+
+示例：
+
+```javascript
+// good
+var num = 3.14;
+Math.ceil(num);
+
+// bad
+var num = 3.14;
+parseInt(num, 10);
+```
+
+### 2.5 字符串
+
+
+##### [强制] 字符串开头和结束使用单引号 `'`。
+
+解释：
+
+1. 输入单引号不需要按住 shift，方便输入。
+2. 实际使用中，字符串经常用来拼接 HTML。为方便 HTML 中包含双引号而不需要转义写法。
+
+示例：
+
+```javascript
+var str = '我是一个字符串';
+var html = '<div class="cls">拼接HTML可以省去双引号转义</div>';
+```
+
+##### [建议] 使用 `数组` 或 `+` 拼接字符串。
+
+解释：
+
+1. 使用 + 拼接字符串，如果拼接的全部是 StringLiteral，压缩工具可以对其进行自动合并的优化。所以，静态字符串建议使用 + 拼接。
+2. 在现代浏览器下，使用 + 拼接字符串，性能较数组的方式要高。
+3. 如需要兼顾老旧浏览器，应尽量使用数组拼接字符串。
+
+示例：
+
+```javascript
+// 使用数组拼接字符串
+var str = [
+    // 推荐换行开始并缩进开始第一个字符串, 对齐代码, 方便阅读.
+    '<ul>',
+        '<li>第一项</li>',
+        '<li>第二项</li>',
+    '</ul>'
+].join('');
+
+// 使用 + 拼接字符串
+var str2 = '' // 建议第一个为空字符串, 第二个换行开始并缩进开始, 对齐代码, 方便阅读
+    + '<ul>',
+    +    '<li>第一项</li>',
+    +    '<li>第二项</li>',
+    + '</ul>';
+```
+
+##### [建议] 复杂的数据到视图字符串的转换过程，选用一种模板引擎。
+
+解释：
+
+使用模板引擎有如下好处：
+
+1. 在开发过程中专注于数据，将视图生成的过程由另外一个层级维护，使程序逻辑结构更清晰。
+2. 优秀的模板引擎，通过模板编译技术和高质量的编译产物，能获得比手工拼接字符串更高的性能。
+
+- artTemplate: 体积较小，在所有环境下性能高，语法灵活。
+- dot.js: 体积小，在现代浏览器下性能高，语法灵活。
+- etpl: 体积较小，在所有环境下性能高，模板复用性高，语法灵活。
+- handlebars: 体积大，在所有环境下性能高，扩展性高。
+- hogon: 体积小，在现代浏览器下性能高。
+- nunjucks: 体积较大，性能一般，模板复用性高。
+
+### 2.6 对象
+
+
+##### [强制] 使用对象字面量 `{}` 创建新 `Object`。
+
+示例： 
+
+```javascript
+// good
+var obj = {};
+
+// bad
+var obj = new Object();
+```
+
+##### [强制] 对象创建时，如果一个对象的所有 `属性` 均可以不添加引号，则所有 `属性` 不得添加引号。
+
+示例： 
+
+```javascript
+var info = {
+    name: 'someone',
+    age: 28
+};
+```
+
+##### [强制] 对象创建时，如果任何一个 `属性` 需要添加引号，则所有 `属性` 必须添加 `'`。
+
+解释：
+
+如果属性不符合 Identifier 和 NumberLiteral 的形式，就需要以 StringLiteral 的形式提供。
+
+
+示例： 
+
+```javascript
+// good
+var info = {
+    'name': 'someone',
+    'age': 28,
+    'more-info': '...'
+};
+
+// bad
+var info = {
+    name: 'someone',
+    age: 28,
+    'more-info': '...'
+};
+```
+
+##### [强制] 不允许修改和扩展任何原生对象和宿主对象的原型。
+
+示例： 
+
+```javascript
+// 以下行为绝对禁止
+String.prototype.trim = function () {
+};
+```
+
+##### [建议] 属性访问时，尽量使用 `.`。
+
+解释：
+
+属性名符合 Identifier 的要求，就可以通过 `.` 来访问，否则就只能通过 `[expr]` 方式访问。
+
+通常在 JavaScript 中声明的对象，属性命名是使用 Camel 命名法，用 `.` 来访问更清晰简洁。部分特殊的属性(比如来自后端的JSON)，可能采用不寻常的命名方式，可以通过 `[expr]` 方式访问。
+
+
+示例： 
+
+```javascript
+info.age;
+info['more-info'];
+```
+
+##### [建议] `for in` 遍历对象时, 使用 `hasOwnProperty` 过滤掉原型中的属性。
+
+示例：
+
+```javascript
+var newInfo = {};
+for (var key in info) {
+    if (info.hasOwnProperty(key)) {
+        newInfo[key] = info[key];
+    }
+}
+```
+
+### 2.7 数组
+
+
+##### [强制] 使用数组字面量 `[]` 创建新数组，除非想要创建的是指定长度的数组。
+
+示例：
+
+```javascript
+// good
+var arr = [];
+
+// bad
+var arr = new Array();
+```
+
+##### [强制] 遍历数组不使用 `for in`。
+
+解释：
+
+数组对象可能存在数字以外的属性, 这种情况下 for in 不会得到正确结果.
+
+示例：
+
+```javascript
+var arr = ['a', 'b', 'c'];
+arr.other = 'other things'; // 这里仅作演示, 实际中应使用Object类型
+
+// 正确的遍历方式
+for (var i = 0, len = arr.length; i < len; i++) {
+    console.log(i);
+}
+
+// 错误的遍历方式
+for (i in arr) {
+    console.log(i);
+}
+```
+
+##### [建议] 不因为性能的原因自己实现数组排序功能，尽量使用数组的 `sort` 方法。
+
+解释：
+
+自己实现的常规排序算法，在性能上并不优于数组默认的 sort 方法。以下两种场景可以自己实现排序：
+
+1. 需要稳定的排序算法，达到严格一致的排序结果。
+2. 数据特点鲜明，适合使用桶排。
+
+##### [建议] 清空数组使用 `.length = 0`。
+
+
+### 2.8 函数
+
+#### 2.8.1 函数长度
+
+
+##### [建议] 一个函数的长度控制在 `50` 行以内。
+
+解释：
+
+将过多的逻辑单元混在一个大函数中，易导致难以维护。一个清晰易懂的函数应该完成单一的逻辑单元。复杂的操作应进一步抽取，通过函数的调用来体现流程。
+
+特定算法等不可分割的逻辑允许例外。
+
+
+示例：
+
+```javascript
+function syncViewStateOnUserAction() {
+    if (x.checked) {
+        y.checked = true;
+        z.value = '';
+    }
+    else {
+        y.checked = false;
+    }
+
+    if (!a.value) {
+        warning.innerText = 'Please enter it';
+        submitButton.disabled = true;
+    }
+    else {
+        warning.innerText = '';
+        submitButton.disabled = false;
+    }
+}
+
+// 直接阅读该函数会难以明确其主线逻辑，因此下方是一种更合理的表达方式：
+
+function syncViewStateOnUserAction() {
+    syncXStateToView();
+    checkAAvailability();
+}
+
+function syncXStateToView() {
+    if (x.checked) {
+        y.checked = true;
+        z.value = '';
+    }
+    else {
+        y.checked = false;
+    }
+}
+
+function checkAAvailability() {
+    if (!a.value) {
+        displayWarningForAMissing();
+    }
+    else {
+        clearWarnignForA();
+    }
+}
+```
+
+#### 2.8.2 参数设计
+
+
+##### [建议] 一个函数的参数控制在 `6` 个以内。
+
+解释：
+
+除去不定长参数以外，函数具备不同逻辑意义的参数建议控制在 6 个以内，过多参数会导致维护难度增大。
+
+某些情况下，如使用 AMD Loader 的 require 加载多个模块时，其 callback 可能会存在较多参数，因此对函数参数的个数不做强制限制。
+
+
+##### [建议] 通过 `options` 参数传递非数据输入型参数。
+
+解释：
+
+有些函数的参数并不是作为算法的输入，而是对算法的某些分支条件判断之用，此类参数建议通过一个 options 参数传递。
+
+如下函数：
+
+```javascript
+/**
+ * 移除某个元素
+ *
+ * @param {Node} element 需要移除的元素
+ * @param {boolean} removeEventListeners 是否同时将所有注册在元素上的事件移除
+ */
+function removeElement(element, removeEventListeners) {
+    element.parent.removeChild(element);
+    if (removeEventListeners) {
+        element.clearEventListeners();
+    }
+}
+```
+
+可以转换为下面的签名：
+
+```javascript
+/**
+ * 移除某个元素
+ *
+ * @param {Node} element 需要移除的元素
+ * @param {Object} options 相关的逻辑配置
+ * @param {boolean} options.removeEventListeners 是否同时将所有注册在元素上的事件移除
+ */
+function removeElement(element, options) {
+    element.parent.removeChild(element);
+    if (options.removeEventListeners) {
+        element.clearEventListeners();
+    }
+}
+```
+
+这种模式有几个显著的优势：
+
+- boolean 型的配置项具备名称，从调用的代码上更易理解其表达的逻辑意义。
+- 当配置项有增长时，无需无休止地增加参数个数，不会出现 removeElement(element, true, false, false, 3) 这样难以理解的调用代码。
+- 当部分配置参数可选时，多个参数的形式非常难处理重载逻辑，而使用一个 options 对象只需判断属性是否存在，实现得以简化。
+
+#### 2.8.3 闭包
+
+##### [建议] 使用 `IIFE` 避免 `Lift 效应`。
+
+解释：
+
+在引用函数外部变量时，函数执行时外部变量的值由运行时决定而非定义时，最典型的场景如下：
+
+```javascript
+var tasks = [];
+for (var i = 0; i < 5; i++) {
+    tasks[tasks.length] = function () {
+        console.log('Current cursor is at ' + i);
+    };
+}
+
+var len = tasks.length;
+while (len--) {
+    tasks[len]();
+}
+```
+
+以上代码对 tasks 中的函数的执行均会输出 `Current cursor is at 5`，往往不符合预期。
+
+此现象称为 **Lift 效应** 。解决的方式是通过额外加上一层闭包函数，将需要的外部变量作为参数传递来解除变量的绑定关系：
+
+```javascript
+var tasks = [];
+for (var i = 0; i < 5; i++) {
+    // 注意有一层额外的闭包
+    tasks[tasks.length] = (function (i) {
+        return function () {
+            console.log('Current cursor is at ' + i);
+        };
+    })(i);
+}
+
+var len = tasks.length;
+while (len--) {
+    tasks[len]();
+}
 ```
