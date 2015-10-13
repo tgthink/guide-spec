@@ -20,7 +20,6 @@
 ##### 全部采用小写方式，以下划线分隔。
 例：css, fonts, images, js, data_models
 
-
 ### 1.2 其他文件命名
 ##### 参照目录命名规则。
 html文件命名 例：error_report.html
@@ -32,6 +31,7 @@ css,less文件命名 例：retina_sprites.less
 
 
 
+- [Html规范](html-giude.md) <span class="std-rec">[1.0]</span>
 - [Javascript规范](javascript-giude.md) <span class="std-rec">[1.0]</span>
 - [CSS,Less规范](css-giude.md) <span class="std-rec">[1.0]</span>
 

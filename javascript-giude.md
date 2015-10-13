@@ -48,7 +48,35 @@
 
 　　　　[2.8.3 闭包](#user-content-283-闭包)
 
+　　　　[2.8.4 空函数](#user-content-284-空函数)
 
+　　　　[2.9 面向对象](#user-content-29-面向对象)
+
+        [2.10 动态特性](#user-content-210-动态特性)
+
+            [2.10.1 eval](#user-content-2101-eval)
+
+            [2.10.2 动态执行代码](#user-content-2102-动态执行代码)
+
+            [2.10.3 with](#user-content-2103-with)
+
+            [2.10.4 delete](#user-content-2104-delete)
+
+            [2.10.5 对象属性](#user-content-2105-对象属性)
+
+[3 浏览器环境](#user-content-3-浏览器环境)
+
+　　[3.1 DOM](#31-dom)
+
+　　　　[3.1.1 元素获取](#user-content-311-元素获取)
+
+　　　　[3.1.2 样式获取](#user-content-312-样式获取)
+
+　　　　[3.1.3 样式设置](#user-content-313-样式设置)
+
+　　　　[3.1.4 DOM 操作](#user-content-314-dom-操作)
+
+　　　　[3.1.5 DOM 事件](#user-content-315-dom-事件)
 
 ## 1 代码风格
 
@@ -1853,3 +1881,357 @@ while (len--) {
     tasks[len]();
 }
 ```
+
+#### 2.8.4 空函数
+
+
+##### [建议] 空函数不使用 `new Function()` 的形式。
+
+示例：
+
+```javascript
+var emptyFunction = function () {};
+```
+
+##### [建议] 对于性能有高要求的场合，建议存在一个空函数的常量，供多处使用共享。
+
+示例：
+
+```javascript
+var EMPTY_FUNCTION = function () {};
+
+function MyClass() {
+}
+
+MyClass.prototype.abstractMethod = EMPTY_FUNCTION;
+MyClass.prototype.hooks.before = EMPTY_FUNCTION;
+MyClass.prototype.hooks.after = EMPTY_FUNCTION;
+```
+
+
+### 2.9 面向对象
+
+
+##### [强制] 类的继承方案，实现时需要修正 `constructor`。
+
+解释：
+
+通常使用其他 library 的类继承方案都会进行 constructor 修正。如果是自己实现的类继承方案，需要进行 constructor 修正。
+
+
+示例：
+
+```javascript
+/**
+ * 构建类之间的继承关系
+ * 
+ * @param {Function} subClass 子类函数
+ * @param {Function} superClass 父类函数
+ */
+function inherits(subClass, superClass) {
+    var F = new Function();
+    F.prototype = superClass.prototype;
+    subClass.prototype = new F();
+    subClass.prototype.constructor = subClass;
+}
+```
+
+##### [建议] 声明类时，保证 `constructor` 的正确性。
+
+示例：
+
+```javascript
+function Animal(name) {
+    this.name = name;
+}
+
+// 直接prototype等于对象时，需要修正constructor
+Animal.prototype = {
+    constructor: Animal,
+
+    jump: function () {
+        alert('animal ' + this.name + ' jump');
+    }
+};
+
+// 这种方式扩展prototype则无需理会constructor
+Animal.prototype.jump = function () {
+    alert('animal ' + this.name + ' jump');
+};
+```
+
+
+##### [建议] 属性在构造函数中声明，方法在原型中声明。
+
+解释： 
+
+原型对象的成员被所有实例共享，能节约内存占用。所以编码时我们应该遵守这样的原则：原型对象包含程序不会修改的成员，如方法函数或配置项。
+
+```javascript
+function TextNode(value, engine) {
+    this.value = value;
+    this.engine = engine;
+}
+
+TextNode.prototype.clone = function () {
+    return this;
+};
+```
+
+
+### 2.10 动态特性
+
+
+#### 2.10.1 eval
+
+
+##### [强制] 避免使用直接 `eval` 函数。
+
+解释：
+
+直接 eval，指的是以函数方式调用 eval 的调用方法。直接 eval 调用执行代码的作用域为本地作用域，应当避免。
+
+如果有特殊情况需要使用直接 eval，需在代码中用详细的注释说明为何必须使用直接 eval，不能使用其它动态执行代码的方式，同时需要其他资深工程师进行 Code Review。
+
+##### [建议] 尽量避免使用 `eval` 函数。
+
+
+#### 2.10.2 动态执行代码
+
+
+##### [建议] 使用 `new Function` 执行动态代码。
+
+解释：
+
+通过 new Function 生成的函数作用域是全局使用域，不会影响当当前的本地作用域。如果有动态代码执行的需求，建议使用 new Function。
+
+
+示例：
+
+```javascript
+var handler = new Function('x', 'y', 'return x + y;');
+var result = handler($('#x').val(), $('#y').val());
+```
+
+
+
+#### 2.10.3 with
+
+
+##### [建议] 尽量不要使用 `with`。
+
+解释：
+
+使用 with 可能会增加代码的复杂度，不利于阅读和管理；也会对性能有影响。大多数使用 with 的场景都能使用其他方式较好的替代。所以，尽量不要使用 with。
+
+
+
+
+#### 2.10.4 delete
+
+
+##### [建议] 减少 `delete` 的使用。
+
+解释：
+
+如果没有特别的需求，减少或避免使用`delete`。`delete`的使用会破坏部分 JavaScript 引擎的性能优化。
+
+
+##### [建议] 处理 `delete` 可能产生的异常。
+
+解释：
+
+对于有被遍历需求，且值 null 被认为具有业务逻辑意义的值的对象，移除某个属性必须使用 delete 操作。
+
+在严格模式或IE下使用 delete 时，不能被删除的属性会抛出异常，因此在不确定属性是否可以删除的情况下，建议添加 try-catch 块。
+
+示例：
+
+```javascript
+try {
+    delete o.x;
+}
+catch (deleteError) {
+    o.x = null;
+}
+```
+
+#### 2.10.5 对象属性
+
+
+
+##### [建议] 避免修改外部传入的对象。
+
+解释：
+
+JavaScript 因其脚本语言的动态特性，当一个对象未被 seal 或 freeze 时，可以任意添加、删除、修改属性值。
+
+但是随意地对 非自身控制的对象 进行修改，很容易造成代码在不可预知的情况下出现问题。因此，设计良好的组件、函数应该避免对外部传入的对象的修改。
+
+下面代码的 selectNode 方法修改了由外部传入的 datasource 对象。如果 datasource 用在其它场合（如另一个 Tree 实例）下，会造成状态的混乱。
+
+```javascript
+function Tree(datasource) {
+    this.datasource = datasource;
+}
+
+Tree.prototype.selectNode = function (id) {
+    // 从datasource中找出节点对象
+    var node = this.findNode(id);
+    if (node) {
+        node.selected = true;
+        this.flushView();
+    }
+};
+```
+
+对于此类场景，需要使用额外的对象来维护，使用由自身控制，不与外部产生任何交互的 selectedNodeIndex 对象来维护节点的选中状态，不对 datasource 作任何修改。
+
+```javascript
+function Tree(datasource) {
+    this.datasource = datasource;
+    this.selectedNodeIndex = {};
+}
+
+Tree.prototype.selectNode = function (id) {
+    // 从datasource中找出节点对象
+    var node = this.findNode(id);
+    if (node) {
+        this.selectedNodeIndex[id] = true;
+        this.flushView();
+    }
+};
+```
+
+除此之外，也可以通过 deepClone 等手段将自身维护的对象与外部传入的分离，保证不会相互影响。
+
+
+##### [建议] 具备强类型的设计。
+
+解释：
+
+- 如果一个属性被设计为 boolean 类型，则不要使用 1 / 0 作为其值。对于标识性的属性，如对代码体积有严格要求，可以从一开始就设计为 number 类型且将 0 作为否定值。
+- 从 DOM 中取出的值通常为 string 类型，如果有对象或函数的接收类型为 number 类型，提前作好转换，而不是期望对象、函数可以处理多类型的值。
+
+## 3 浏览器环境
+
+
+### 3.1 DOM
+
+
+#### 3.1.1 元素获取
+
+
+##### [建议] 对于单个元素，尽可能使用 `document.getElementById` 获取，避免使用`document.all`。
+
+
+##### [建议] 对于多个元素的集合，尽可能使用 `context.getElementsByTagName` 获取。其中 `context` 可以为 `document` 或其他元素。指定 `tagName` 参数为 `*` 可以获得所有子元素。
+
+##### [建议] 遍历元素集合时，尽量缓存集合长度。如需多次操作同一集合，则应将集合转为数组。
+
+解释：
+
+原生获取元素集合的结果并不直接引用 DOM 元素，而是对索引进行读取，所以 DOM 结构的改变会实时反映到结果中。
+
+
+示例：
+
+```html
+<div></div>
+<span></span>
+
+<script>
+var elements = document.getElementsByTagName('*');
+
+// 显示为 DIV
+alert(elements[0].tagName);
+
+var div = elements[0];
+var p = document.createElement('p');
+docpment.body.insertBefore(p, div);
+
+// 显示为 P
+alert(elements[0].tagName);
+</script>
+```
+
+
+##### [建议] 获取元素的直接子元素时使用 `children`。避免使用`childNodes`，除非预期是需要包含文本、注释和属性类型的节点。
+
+
+
+
+#### 3.1.2 样式获取
+
+
+##### [建议] 获取元素实际样式信息时，应使用 `getComputedStyle` 或 `currentStyle`。
+
+解释：
+
+通过 style 只能获得内联定义或通过 JavaScript 直接设置的样式。通过 CSS class 设置的元素样式无法直接通过 style 获取。
+
+
+
+
+#### 3.1.3 样式设置
+
+
+##### [建议] 尽可能通过为元素添加预定义的 className 来改变元素样式，避免直接操作 style 设置。
+
+##### [强制] 通过 style 对象设置元素样式时，对于带单位非 0 值的属性，不允许省略单位。
+
+解释：
+
+除了 IE，标准浏览器会忽略不规范的属性值，导致兼容性问题。
+
+
+
+
+#### 3.1.4 DOM 操作
+
+
+##### [建议] 操作 `DOM` 时，尽量减少页面 `reflow`。
+
+解释：
+
+页面 reflow 是非常耗时的行为，非常容易导致性能瓶颈。下面一些场景会触发浏览器的reflow：
+
+- DOM元素的添加、修改（内容）、删除。
+- 应用新的样式或者修改任何影响元素布局的属性。
+- Resize浏览器窗口、滚动页面。
+- 读取元素的某些属性（offsetLeft、offsetTop、offsetHeight、offsetWidth、scrollTop/Left/Width/Height、clientTop/Left/Width/Height、getComputedStyle()、currentStyle(in IE)) 。
+
+
+##### [建议] 尽量减少 `DOM` 操作。
+
+解释：
+
+DOM 操作也是非常耗时的一种操作，减少 DOM 操作有助于提高性能。举一个简单的例子，构建一个列表。我们可以用两种方式：
+
+1. 在循环体中 createElement 并 append 到父元素中。
+2. 在循环体中拼接 HTML 字符串，循环结束后写父元素的 innerHTML。
+
+第一种方法看起来比较标准，但是每次循环都会对 DOM 进行操作，性能极低。在这里推荐使用第二种方法。
+
+
+
+
+#### 3.1.5 DOM 事件
+
+
+##### [建议] 优先使用 `addEventListener / attachEvent` 绑定事件，避免直接在 HTML 属性中或 DOM 的 `expando` 属性绑定事件处理。
+
+解释：
+
+expando 属性绑定事件容易导致互相覆盖。
+
+
+##### [建议] 使用 `addEventListener` 时第三个参数使用 `false`。
+
+解释：
+
+标准浏览器中的 addEventListener 可以通过第三个参数指定两种时间触发模型：冒泡和捕获。而 IE 的 attachEvent 仅支持冒泡的事件触发。所以为了保持一致性，通常 addEventListener 的第三个参数都为 false。
+
+
+##### [建议] 在没有事件自动管理的框架支持下，应持有监听器函数的引用，在适当时候（元素释放、页面卸载等）移除添加的监听器。
+
