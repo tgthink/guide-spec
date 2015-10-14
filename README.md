@@ -28,9 +28,6 @@ js文件命名 例：account_model.js
 
 css,less文件命名 例：retina_sprites.less
 
-
-
-
 - [Html规范](html-giude.md) <span class="std-rec">[1.0]</span>
 - [Javascript规范](javascript-giude.md) <span class="std-rec">[1.0]</span>
 - [CSS,Less规范](css-giude.md) <span class="std-rec">[1.0]</span>

@@ -724,11 +724,10 @@ var zhangsan = 'zhangsan'; // one space after code
 示例：
 
 ```javascript
-if (condition) {
-    // if you made it here, then all security checks passed
-    allowed();
-}
-var zhangsan = 'zhangsan'; // one space after code
+/*
+ * one space after '*'
+ */
+var x = 1;
 ```
 
 #### 1.3.3 文档注释
