@@ -52,17 +52,17 @@
 
 　　　　[2.9 面向对象](#user-content-29-面向对象)
 
-        [2.10 动态特性](#user-content-210-动态特性)
+　　　　[2.10 动态特性](#user-content-210-动态特性)
 
-            [2.10.1 eval](#user-content-2101-eval)
+　　　　    [2.10.1 eval](#user-content-2101-eval)
 
-            [2.10.2 动态执行代码](#user-content-2102-动态执行代码)
+　　　　    [2.10.2 动态执行代码](#user-content-2102-动态执行代码)
 
-            [2.10.3 with](#user-content-2103-with)
+　　　　    [2.10.3 with](#user-content-2103-with)
 
-            [2.10.4 delete](#user-content-2104-delete)
+　　　　    [2.10.4 delete](#user-content-2104-delete)
 
-            [2.10.5 对象属性](#user-content-2105-对象属性)
+　　　　    [2.10.5 对象属性](#user-content-2105-对象属性)
 
 [3 浏览器环境](#user-content-3-浏览器环境)
 
@@ -2049,8 +2049,7 @@ var result = handler($('#x').val(), $('#y').val());
 ```javascript
 try {
     delete o.x;
-}
-catch (deleteError) {
+} catch (deleteError) {
     o.x = null;
 }
 ```
